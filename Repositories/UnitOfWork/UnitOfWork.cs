@@ -1,6 +1,7 @@
 ﻿using PersonalShopper.DAL;
 using PersonalShopper.Repositories.CartProductRepository;
 using PersonalShopper.Repositories.CartRepository;
+using PersonalShopper.Repositories.OrderRepository;
 using PersonalShopper.Repositories.ProductRepository;
 using PersonalShopper.Repositories.UserRepository;
 
@@ -30,6 +31,12 @@ namespace PersonalShopper.Repositories.UnitOfWork
         }
 
         public ICartProductRepository CartProducts
+        {
+            get;
+            private set;
+        }
+
+        public IOrderRepository Orders
         {
             get;
             private set;

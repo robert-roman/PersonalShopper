@@ -54,7 +54,6 @@ namespace PersonalShopper.Controllers
             if (searchedProducts == null || searchedProducts.Count == 0)
             {
                 return NotFound("Category not listed or no searched product available");
-
             }
 
             return searchedProducts.Select(p => new ProductDTO(p)).ToList();
@@ -108,10 +107,6 @@ namespace PersonalShopper.Controllers
                 return NotFound("Product with specified id doesn't exist");
             }
 
-            searchedProduct.ProductId = product.ProductId;
-            searchedProduct.ProductName = product.ProductName;
-            searchedProduct.ProductCategory = product.ProductCategory;
-            searchedProduct.ProductBrand = product.ProductBrand;
             searchedProduct.ProductDescription = product.ProductDescription;
             searchedProduct.ProductPrice = product.ProductPrice;
             searchedProduct.ProductStock = product.ProductStock;
