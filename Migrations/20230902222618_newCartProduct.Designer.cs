@@ -12,8 +12,8 @@ using PersonalShopper.DAL;
 namespace PersonalShopper.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230902200804_CartNewTable")]
-    partial class CartNewTable
+    [Migration("20230902222618_newCartProduct")]
+    partial class newCartProduct
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -127,7 +127,7 @@ namespace PersonalShopper.Migrations
 
             modelBuilder.Entity("PersonalShopper.DAL.Models.CartProduct", b =>
                 {
-                    b.Property<int>("CartId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int")
                         .HasColumnOrder(0);
 
@@ -138,7 +138,7 @@ namespace PersonalShopper.Migrations
                     b.Property<int>("CartProductQuantity")
                         .HasColumnType("int");
 
-                    b.HasKey("CartId", "ProductId");
+                    b.HasKey("UserId", "ProductId");
 
                     b.HasIndex("ProductId");
 
@@ -153,6 +153,9 @@ namespace PersonalShopper.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"), 1L, 1);
 
+                    b.Property<int>("OrderCartUserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("OrderStatus")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -161,6 +164,8 @@ namespace PersonalShopper.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("OrderId");
+
+                    b.HasIndex("OrderCartUserId");
 
                     b.HasIndex("UserId");
 
@@ -423,7 +428,7 @@ namespace PersonalShopper.Migrations
                     b.HasOne("PersonalShopper.DAL.Models.User", "User")
                         .WithOne("Cart")
                         .HasForeignKey("PersonalShopper.DAL.Models.Cart", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -431,16 +436,16 @@ namespace PersonalShopper.Migrations
 
             modelBuilder.Entity("PersonalShopper.DAL.Models.CartProduct", b =>
                 {
-                    b.HasOne("PersonalShopper.DAL.Models.Cart", "Cart")
-                        .WithMany("CartProducts")
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("PersonalShopper.DAL.Models.Product", "Product")
                         .WithMany("CartProducts")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PersonalShopper.DAL.Models.Cart", "Cart")
+                        .WithMany("CartProducts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Cart");
@@ -450,11 +455,19 @@ namespace PersonalShopper.Migrations
 
             modelBuilder.Entity("PersonalShopper.DAL.Models.Order", b =>
                 {
+                    b.HasOne("PersonalShopper.DAL.Models.Cart", "OrderCart")
+                        .WithMany()
+                        .HasForeignKey("OrderCartUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("PersonalShopper.DAL.Models.User", "User")
                         .WithMany("UserOrders")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("OrderCart");
 
                     b.Navigation("User");
                 });

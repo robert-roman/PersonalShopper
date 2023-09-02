@@ -15,6 +15,7 @@ namespace PersonalShopper.Repositories.UnitOfWork
             _context = context;
             Products = new ProductRepository.ProductRepository(_context);
             Carts = new CartRepository.CartRepository(_context);
+            CartProducts = new CartProductRepository.CartProductRepository(_context);
             Users = new UserRepository.UserRepository(_context);
         }
 

@@ -20,7 +20,7 @@ namespace PersonalShopper.Controllers
 
         //GET: api/Users/{email}
         [HttpGet("{email}")]
-        [Authorize(Roles = "Admin,User")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUserByEmail(string email)
         {
             var user = await _unitOfWork.Users.GetUserByEmail(email);

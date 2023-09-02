@@ -7,13 +7,13 @@ namespace PersonalShopper.DAL.Models
     public class CartProduct
     {
         [Key, Column(Order=0)]
-        public int CartId { get; set; }
+        public int UserId { get; set; }
         [Key, Column(Order=1)]
         public int ProductId { get; set; }
         public int CartProductQuantity { get; set; }
         [ForeignKey("ProductId")]
         public Product? Product { get; set; }
-        [ForeignKey("CartId")]
+        [ForeignKey("UserId")]
         public Cart? Cart { get; set; }
     }
 }

@@ -37,7 +37,7 @@ namespace PersonalShopper.Controllers
         {
             var cartProductToAdd = new CartProduct();
             cartProductToAdd.ProductId = cartProduct.ProductId;
-            cartProductToAdd.CartId = cartProduct.CartId;
+            cartProductToAdd.UserId = cartProduct.UserId;
             cartProductToAdd.CartProductQuantity = cartProduct.CartProductQuantity;
 
             await _unitOfWork.CartProducts.Create(cartProductToAdd);

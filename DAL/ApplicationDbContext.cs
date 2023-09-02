@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using PersonalShopper.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace PersonalShopper.DAL
 {
     public class ApplicationDbContext : IdentityDbContext<User, Role, int,
@@ -27,24 +26,23 @@ namespace PersonalShopper.DAL
             modelBuilder.Entity<User>()
                 .HasOne(user => user.Cart)
                 .WithOne(cart => cart.User)
-                .HasForeignKey<Cart>(cart => cart.UserId);
+                .HasForeignKey<Cart>(cart => cart.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<User>()
                 .HasMany(user => user.UserOrders)
-                .WithOne(order => order.User);
-
+                .WithOne(order => order.User)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<CartProduct>()
                 .HasOne(cartProduct => cartProduct.Cart)
-                .WithMany(cart => cart.CartProducts);
+                .WithMany(cart => cart.CartProducts)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<CartProduct>()
                 .HasOne(cartProduct => cartProduct.Product)
-                .WithMany(product => product.CartProducts);
-
-            modelBuilder.Entity<Order>()
-                .HasOne(order => order.User)
-                .WithMany(user => user.UserOrders);
-
+                .WithMany(product => product.CartProducts)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserRole>(ur =>
             {
@@ -56,9 +54,8 @@ namespace PersonalShopper.DAL
 
             modelBuilder.Entity<CartProduct>(cp =>
             {
-                cp.HasKey(cp => new {cp.CartId, cp.ProductId});
+                cp.HasKey(cp => new { cp.UserId, cp.ProductId });
             });
         }
-
     }
 }
