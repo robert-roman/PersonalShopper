@@ -72,7 +72,6 @@ namespace PersonalShopper.Controllers
             var orderToPlace = new Order();
             orderToPlace.OrderId = order.OrderId;
             orderToPlace.UserId = order.UserId;
-            orderToPlace.CartId = order.CartId;
             orderToPlace.OrderStatus = order.OrderStatus;
 
             await _unitOfWork.Orders.Create(orderToPlace);

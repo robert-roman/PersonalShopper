@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using PersonalShopper.Repositories.UnitOfWork;
 
 namespace PersonalShopper.Services
 {
@@ -14,11 +15,13 @@ namespace PersonalShopper.Services
     {
         private readonly UserManager<User> _userManager;
         private readonly IAuthWrapperRepository _repository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UserService(IAuthWrapperRepository repository, UserManager<User> userManager)
+        public UserService(IAuthWrapperRepository repository, UserManager<User> userManager, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _repository = repository;
+            _unitOfWork = unitOfWork;
         }
         public async Task<bool> RegisterUserAsync(UserRegisterDTO dto)
         {
@@ -34,6 +37,14 @@ namespace PersonalShopper.Services
 
             if (result.Succeeded)
             {
+                var cart = new Cart
+                {
+                    User = registerUser
+                };
+
+                _unitOfWork.Carts.Create(cart);
+                _unitOfWork.Save();
+
                 await _userManager.AddToRoleAsync(registerUser, UserRoleType.User);
 
                 return true;

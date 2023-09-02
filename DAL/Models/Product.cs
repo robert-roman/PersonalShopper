@@ -12,6 +12,6 @@ namespace PersonalShopper.DAL.Models
         public string ProductDescription { get; set; }
         public float ProductPrice { get; set; }
         public int? ProductStock { get; set; }
-        public ICollection<CartProduct>? CartProducts { get; set; }
+        public virtual ICollection<CartProduct>? CartProducts { get; set; }
     }
 }

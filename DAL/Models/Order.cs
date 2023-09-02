@@ -9,11 +9,9 @@ namespace PersonalShopper.DAL.Models
         [Key]
         public int OrderId { get; set; }
         public int UserId { get; set; }
-        public int CartId { get; set; }
         [ForeignKey("UserId")]
-        public User? User { get; set; }
-        [ForeignKey("CartId")]
-        public Cart? Cart { get; set; }
+        public User User { get; set; }
+        public Cart OrderCart { get; set; }
         public string OrderStatus { get; set; }
         //an OrderStatus can be Placed, OnTrack, Delivered
 

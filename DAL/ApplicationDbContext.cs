@@ -26,7 +26,9 @@ namespace PersonalShopper.DAL
 
             modelBuilder.Entity<User>()
                 .HasOne(user => user.Cart)
-                .WithOne(cart => cart.User);
+                .WithOne(cart => cart.User)
+                .HasForeignKey<Cart>(cart => cart.UserId);
+
             modelBuilder.Entity<User>()
                 .HasMany(user => user.UserOrders)
                 .WithOne(order => order.User);
@@ -42,8 +44,7 @@ namespace PersonalShopper.DAL
             modelBuilder.Entity<Order>()
                 .HasOne(order => order.User)
                 .WithMany(user => user.UserOrders);
-            modelBuilder.Entity<Order>()
-                .HasOne(order => order.Cart);
+
 
             modelBuilder.Entity<UserRole>(ur =>
             {
