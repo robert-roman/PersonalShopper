@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.Collections;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace PersonalShopper.DAL.Models
 {
@@ -12,6 +13,7 @@ namespace PersonalShopper.DAL.Models
         public int Age { get; set; }
         public virtual Cart Cart { get; set; }
         public virtual ICollection<Order> UserOrders { get; set; }
+        [JsonIgnore]
         public ICollection<UserRole> UserRoles { get; set; }
         public string RefreshToken { get; set; } = string.Empty;
         public DateTime TokenCreated { get; set; }

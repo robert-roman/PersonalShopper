@@ -1,6 +1,9 @@
 ﻿using PersonalShopper.Repositories.UnitOfWork;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PersonalShopper.DAL.DTOs;
+using System.Security.Claims;
+using System.Linq;
 
 namespace PersonalShopper.Controllers
 {
@@ -38,6 +41,34 @@ namespace PersonalShopper.Controllers
             var users = await _unitOfWork.Users.GetAll();
 
             return Ok(new { users });
+        }
+
+        //PUT: api/Users/email/{userEmail}
+        [HttpPut("email/{userEmail}")]
+        [Authorize(Roles = "Admin,User")]
+        public async Task<ActionResult<UserRegisterDTO>> ModifyUserProfile(string userEmail, UserRegisterDTO userModified)
+        {
+            var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserID == null)
+            {
+                return Forbid("No user currently logged in");
+            }
+            
+            var loggedUser = await _unitOfWork.Users.GetUserAndUserRoleById(int.Parse(currentUserID));
+            if (!loggedUser.Email.Equals(userEmail) && !loggedUser.UserRoles.Any(ur => ur.Role.Name == "Admin"))
+            {
+                return Forbid("You are not authorized to edit other users' profile");
+            }
+
+            loggedUser.Email = userModified.Email;
+            loggedUser.FirstName = userModified.FirstName;
+            loggedUser.LastName = userModified.LastName;
+
+            await _unitOfWork.Users.Update(loggedUser);
+            _unitOfWork.Save();
+
+            return Ok(loggedUser);
+
         }
 
         //DELETE: api/Users/DeleteProfile{email}
