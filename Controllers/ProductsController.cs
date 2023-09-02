@@ -8,7 +8,7 @@ namespace PersonalShopper.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : Controller
+    public class ProductsController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
         public ProductsController(IUnitOfWork unitOfWork)
@@ -18,7 +18,7 @@ namespace PersonalShopper.Controllers
 
         //GET: api/Products
         [HttpGet]
-        [Authorize(Roles = "Admin,User")]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts()
         {
             if (_unitOfWork.Products == null)
@@ -29,9 +29,9 @@ namespace PersonalShopper.Controllers
             return results;
         }
 
-        //GET: api/Products/name
-        [HttpGet("{name}")]
-        [Authorize("Admin,User")]
+        //GET: api/Products/productName/{productName}
+        [HttpGet("productName/{productName}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ProductDTO>> GetProductByName(string productName)
         {
             var searchedProduct = await _unitOfWork.Products.GetProductByName(productName);
@@ -44,9 +44,9 @@ namespace PersonalShopper.Controllers
             return new ProductDTO(searchedProduct);
         }
 
-        //GET: api/Products/category
-        [HttpGet("{category}")]
-        [Authorize("Admin,User")]
+        //GET: api/Products/category/{productCategory}
+        [HttpGet("category/{productCategory}")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<ProductDTO>>> GetProductsWithCategory(string productCategory)
         {
             var searchedProducts = await _unitOfWork.Products.GetProductsWithCategory(productCategory);
@@ -59,9 +59,9 @@ namespace PersonalShopper.Controllers
             return searchedProducts.Select(p => new ProductDTO(p)).ToList();
         }
 
-        //GET: api/Products/description
-        [HttpGet("{description}")]
-        [Authorize("Admin,User")]
+        //GET: api/Products/description/{productDescription}
+        [HttpGet("description/{productDescription}")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<ProductDTO>>> GetProductsContainingDescription(string productDescription)
         {
             var searchedProducts = await _unitOfWork.Products.GetProductsContainingDescription(productDescription);
@@ -77,11 +77,10 @@ namespace PersonalShopper.Controllers
 
         //POST: api/Products
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles ="Admin")]
         public async Task<ActionResult<ProductDTO>> PostProducts(ProductDTO product)
         {
             var ProductToAdd = new Product();
-            ProductToAdd.ProductId = product.ProductId;
             ProductToAdd.ProductName = product.ProductName;
             ProductToAdd.ProductCategory = product.ProductCategory;
             ProductToAdd.ProductBrand = product.ProductBrand;
@@ -95,12 +94,12 @@ namespace PersonalShopper.Controllers
             return Ok();
         }
 
-        //PUT: api/Products/id
-        [HttpPut("{id}")]
+        //PUT: api/Products/id/{productId}
+        [HttpPut("id/{productId}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PutProduct(int id, ProductDTO product)
+        public async Task<IActionResult> PutProduct(int productId, ProductDTO product)
         {
-            var searchedProduct = await _unitOfWork.Products.GetById(id);
+            var searchedProduct = await _unitOfWork.Products.GetById(productId);
 
             if (searchedProduct == null)
             {
@@ -117,12 +116,12 @@ namespace PersonalShopper.Controllers
             return Ok();
         }
 
-        //DELETE: api/Products/id
-        [HttpDelete("{id}")]
+        //DELETE: api/Products/id/{productId}
+        [HttpDelete("id/{productId}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteProduct(int id)
+        public async Task<IActionResult> DeleteProduct(int productId)
         {
-            var searchedProduct = await _unitOfWork.Products.GetById(id);
+            var searchedProduct = await _unitOfWork.Products.GetById(productId);
 
             if (searchedProduct == null)
             {
