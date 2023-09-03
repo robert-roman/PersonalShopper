@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PersonalShopper.DAL.DTOs;
 using PersonalShopper.DAL.Models;
 using PersonalShopper.Repositories.UnitOfWork;
+using System.Security.Claims;
 
 namespace PersonalShopper.Controllers
 {
@@ -35,9 +36,16 @@ namespace PersonalShopper.Controllers
         [Authorize(Roles = "Admin,User")]
         public async Task<ActionResult<CartProductDTO>> AddCartProduct(CartProductDTO cartProduct)
         {
+            var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserID == null)
+            {
+                return Forbid("No user currently logged in");
+            }
+
+
             var cartProductToAdd = new CartProduct();
             cartProductToAdd.ProductId = cartProduct.ProductId;
-            cartProductToAdd.UserId = cartProduct.UserId;
+            cartProductToAdd.UserId = int.Parse(currentUserID);
             cartProductToAdd.CartProductQuantity = cartProduct.CartProductQuantity;
 
             await _unitOfWork.CartProducts.Create(cartProductToAdd);
@@ -49,9 +57,15 @@ namespace PersonalShopper.Controllers
         //PUT: api/CartProducts
         [HttpPut]
         [Authorize(Roles = "Admin,User")]
-        public async Task<IActionResult> ModifyCartProductQuantity(int cartId, int productId, int newCartQuantity)
+        public async Task<IActionResult> ModifyCartProductQuantity(int productId, int newCartQuantity)
         {
-            var existingCartProduct = await _unitOfWork.CartProducts.GetByComposedId(cartId, productId);
+            var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserID == null)
+            {
+                return Forbid("No user currently logged in");
+            }
+
+            var existingCartProduct = await _unitOfWork.CartProducts.GetByComposedId(int.Parse(currentUserID), productId);
 
             if (existingCartProduct == null)
             { 
