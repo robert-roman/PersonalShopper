@@ -11,7 +11,7 @@ namespace PersonalShopper.DAL.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int Age { get; set; }
-        public virtual Cart Cart { get; set; }
+        public Cart Cart { get; set; } = null!;
         public virtual ICollection<Order> UserOrders { get; set; }
         [JsonIgnore]
         public ICollection<UserRole> UserRoles { get; set; }

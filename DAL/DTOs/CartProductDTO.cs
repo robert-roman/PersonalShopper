@@ -12,7 +12,7 @@ namespace PersonalShopper.DAL.DTOs
 
         public CartProductDTO(CartProduct cartProduct)
         {
-            UserId = cartProduct.UserId;
+            UserId = cartProduct.CartId;
             ProductId = cartProduct.ProductId;
             CartProductQuantity = cartProduct.CartProductQuantity;
         }

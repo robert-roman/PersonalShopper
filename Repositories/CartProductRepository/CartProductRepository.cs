@@ -11,6 +11,6 @@ namespace PersonalShopper.Repositories.CartProductRepository
         public CartProductRepository(ApplicationDbContext context) : base(context) { }
 
         public async Task<List<CartProduct>> GetProductsByCartId(int cartId) =>
-            await _context.CartProducts.Where(cp => cp.UserId.Equals(cartId)).ToListAsync();
+            await _context.CartProducts.Where(cp => cp.CartId.Equals(cartId)).ToListAsync();
     }
 }

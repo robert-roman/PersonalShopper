@@ -6,12 +6,11 @@ namespace PersonalShopper.DAL.Models
     public class Cart
     {
         [Key]
-        [ForeignKey("User")]
+        public int CartId { get; set; }
         public int UserId { get; set; }
+        public User User { get; set; } = null!;
 
-        public virtual User User { get; set; }
-
-        public ICollection<CartProduct> CartProducts { get; set; }
+        public ICollection<CartProduct>? CartProducts { get; set; }
         public float CartPrice { get; set; }
     }
 }

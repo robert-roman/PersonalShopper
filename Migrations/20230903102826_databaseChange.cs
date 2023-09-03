@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PersonalShopper.Migrations
 {
-    public partial class newCartProduct : Migration
+    public partial class databaseChange : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -184,18 +184,20 @@ namespace PersonalShopper.Migrations
                 name: "Carts",
                 columns: table => new
                 {
+                    CartId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     CartPrice = table.Column<float>(type: "real", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Carts", x => x.UserId);
+                    table.PrimaryKey("PK_Carts", x => x.CartId);
                     table.ForeignKey(
                         name: "FK_Carts_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -243,18 +245,18 @@ namespace PersonalShopper.Migrations
                 name: "CartProducts",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "int", nullable: false),
+                    CartId = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     CartProductQuantity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CartProducts", x => new { x.UserId, x.ProductId });
+                    table.PrimaryKey("PK_CartProducts", x => new { x.CartId, x.ProductId });
                     table.ForeignKey(
-                        name: "FK_CartProducts_Carts_UserId",
-                        column: x => x.UserId,
+                        name: "FK_CartProducts_Carts_CartId",
+                        column: x => x.CartId,
                         principalTable: "Carts",
-                        principalColumn: "UserId",
+                        principalColumn: "CartId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_CartProducts_Products_ProductId",
@@ -271,7 +273,7 @@ namespace PersonalShopper.Migrations
                     OrderId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    OrderCartUserId = table.Column<int>(type: "int", nullable: false),
+                    OrderCartCartId = table.Column<int>(type: "int", nullable: false),
                     OrderStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -284,10 +286,10 @@ namespace PersonalShopper.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Orders_Carts_OrderCartUserId",
-                        column: x => x.OrderCartUserId,
+                        name: "FK_Orders_Carts_OrderCartCartId",
+                        column: x => x.OrderCartCartId,
                         principalTable: "Carts",
-                        principalColumn: "UserId",
+                        principalColumn: "CartId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -336,9 +338,15 @@ namespace PersonalShopper.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_OrderCartUserId",
+                name: "IX_Carts_UserId",
+                table: "Carts",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_OrderCartCartId",
                 table: "Orders",
-                column: "OrderCartUserId");
+                column: "OrderCartCartId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_UserId",

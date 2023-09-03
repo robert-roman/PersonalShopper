@@ -45,7 +45,7 @@ namespace PersonalShopper.Controllers
 
             var cartProductToAdd = new CartProduct();
             cartProductToAdd.ProductId = cartProduct.ProductId;
-            cartProductToAdd.UserId = int.Parse(currentUserID);
+            cartProductToAdd.CartId = int.Parse(currentUserID);
             cartProductToAdd.CartProductQuantity = cartProduct.CartProductQuantity;
 
             await _unitOfWork.CartProducts.Create(cartProductToAdd);
@@ -83,9 +83,9 @@ namespace PersonalShopper.Controllers
         //DELETE: api/CartProducts
         [HttpDelete]
         [Authorize(Roles ="Admin,User")]
-        public async Task<IActionResult> DeleteCartProduct(int cartId, int productId)
+        public async Task<IActionResult> DeleteCartProduct(int userId, int productId)
         {
-            var existingCartProduct = await _unitOfWork.CartProducts.GetByComposedId(cartId, productId);
+            var existingCartProduct = await _unitOfWork.CartProducts.GetByComposedId(userId, productId);
 
             if (existingCartProduct == null)
             {

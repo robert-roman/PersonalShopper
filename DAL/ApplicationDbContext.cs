@@ -24,10 +24,10 @@ namespace PersonalShopper.DAL
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<User>()
-                .HasOne(user => user.Cart)
-                .WithOne(cart => cart.User)
-                .HasForeignKey<Cart>(cart => cart.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(e => e.Cart)
+                .WithOne(e => e.User)
+                .HasForeignKey<Cart>(e => e.UserId)
+                .IsRequired();
 
             modelBuilder.Entity<User>()
                 .HasMany(user => user.UserOrders)
@@ -54,7 +54,7 @@ namespace PersonalShopper.DAL
 
             modelBuilder.Entity<CartProduct>(cp =>
             {
-                cp.HasKey(cp => new { cp.UserId, cp.ProductId });
+                cp.HasKey(cp => new { cp.CartId, cp.ProductId });
             });
         }
     }

@@ -25,13 +25,14 @@ namespace PersonalShopper.Services
         }
         public async Task<bool> RegisterUserAsync(UserRegisterDTO dto)
         {
-            var registerUser = new User();
-
-            registerUser.Email = dto.Email;
-            registerUser.UserName = dto.Email;
-            registerUser.FirstName = dto.FirstName;
-            registerUser.LastName = dto.LastName;
-            registerUser.Age = dto.Age;
+            var registerUser = new User
+            {
+                Email = dto.Email,
+                UserName = dto.Email,
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Age = dto.Age
+            };
 
             var result = await _userManager.CreateAsync(registerUser, dto.Password);
 
@@ -42,8 +43,11 @@ namespace PersonalShopper.Services
                     User = registerUser
                 };
 
-                _unitOfWork.Carts.Create(cart);
+                await _unitOfWork.Carts.Create(cart);
                 _unitOfWork.Save();
+                registerUser.Cart = cart;
+                await _userManager.UpdateAsync(registerUser);
+
 
                 await _userManager.AddToRoleAsync(registerUser, UserRoleType.User);
 
@@ -52,6 +56,7 @@ namespace PersonalShopper.Services
 
             return false;
         }
+
 
         public async Task<string> LoginUser(UserLoginDTO dto)
         {

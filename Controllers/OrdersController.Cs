@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PersonalShopper.DAL.DTOs;
 using PersonalShopper.DAL.Models;
 using PersonalShopper.Repositories.UnitOfWork;
+using System.Security.Claims;
 
 namespace PersonalShopper.Controllers
 {
@@ -18,7 +19,7 @@ namespace PersonalShopper.Controllers
 
         //GET: api/Orders/status
         [HttpGet("{status}")]
-        [Authorize(Roles = "Admin,User")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<OrderDTO>>> GetOrdersWithSelectedStatus(string status)
         {
             var searchedOrders = await _unitOfWork.Orders.GetOrdersByStatus(status);
@@ -31,28 +32,52 @@ namespace PersonalShopper.Controllers
             return searchedOrders.Select(o => new OrderDTO(o)).ToList();
         }
 
-        //GET: api/Orders/id
-        [HttpGet("{id}")]
+        //GET: api/Orders/id/{orderId}
+        [HttpGet("id/{orderId}")]
         [Authorize(Roles = "Admin,User")]
-        public async Task<ActionResult<OrderDTO>> GetOrderById(int id)
+        public async Task<ActionResult<OrderDTO>> GetOrderById(int orderId)
         {
-            var searchedOrder = await _unitOfWork.Orders.GetOrderById(id);
+            var searchedOrder = await _unitOfWork.Orders.GetOrderById(orderId);
 
             if (searchedOrder == null)
             {
                 return NotFound("No order registered with this id");
             }
 
+            var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserID == null)
+            {
+                return Forbid("No user currently logged in");
+            }
+
+            var loggedUser = await _unitOfWork.Users.GetUserAndUserRoleById(int.Parse(currentUserID));
+            if (!searchedOrder.UserId.Equals(loggedUser.Id) && !loggedUser.UserRoles.Any(ur => ur.Role.Name == "Admin"))
+            {
+                return Forbid("Regular users can see only their orders");
+            }
+
             return new OrderDTO(searchedOrder);
         }
 
 
-        //GET: api/Orders/userId
-        [HttpGet("{userId}")]
+        //GET: api/Orders/email/{userEmail}
+        [HttpGet("email/{userEmail}")]
         [Authorize(Roles = "Admin,User")]
-        public async Task<ActionResult<List<OrderDTO>>> GetAllUserOrders(int id)
+        public async Task<ActionResult<List<OrderDTO>>> GetAllUserOrders(string userEmail)
         {
-            var userOrders = await _unitOfWork.Orders.GetAllUserOrders(id);
+            var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserID == null)
+            {
+                return Forbid("No user currently logged in");
+            }
+
+            var loggedUser = await _unitOfWork.Users.GetUserAndUserRoleById(int.Parse(currentUserID));
+            if (!loggedUser.Email.Equals(userEmail) && !loggedUser.UserRoles.Any(ur => ur.Role.Name == "Admin"))
+            {
+                return Forbid("Regular users can see only their orders");
+            }
+
+            var userOrders = await _unitOfWork.Orders.GetAllUserOrders(loggedUser.Id);
 
             if (userOrders == null || userOrders.Count() == 0)
             {
@@ -64,25 +89,38 @@ namespace PersonalShopper.Controllers
         }
 
 
-        //POST: api/Orders
         [HttpPost]
-        [Authorize(Roles = "User")]
-        public async Task<ActionResult<OrderDTO>> PlaceUserOrder(OrderDTO order)
+        [Authorize(Roles = "Admin,User")]
+        public async Task<ActionResult<OrderDTO>> PlaceUserOrder()
         {
+            var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserID == null)
+            {
+                return Forbid("No user currently logged in");
+            }
+
+            var loggedUser = await _unitOfWork.Users.GetUserAndUserRoleById(int.Parse(currentUserID));
+            if (loggedUser == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var orderCart = await _unitOfWork.Carts.GetCartById(int.Parse(currentUserID));
+
             var orderToPlace = new Order();
-            orderToPlace.OrderId = order.OrderId;
-            orderToPlace.UserId = order.UserId;
-            orderToPlace.OrderStatus = order.OrderStatus;
+            orderToPlace.UserId = loggedUser.Id;
+            orderToPlace.OrderCart = orderCart;
+            orderToPlace.OrderStatus = "Placed";
 
             await _unitOfWork.Orders.Create(orderToPlace);
             _unitOfWork.Save();
 
-            return Ok();
+            return Ok(orderToPlace);
         }
 
         //PUT: api/Orders
         [HttpPut]
-        [Authorize(Roles = "Admin,User")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<OrderDTO>> ModifyOrderStatus(int id, string newStatus)
         {
             var orderToModify = await _unitOfWork.Orders.GetOrderById(id);
@@ -102,7 +140,7 @@ namespace PersonalShopper.Controllers
 
         //DELETE: api/Orders
         [HttpDelete]
-        [Authorize(Roles = "Admin,User")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeleteOrder (int id)
         {
             var searchedOrder = await _unitOfWork.Orders.GetOrderById(id);

@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using PersonalShopper.DAL.DTOs;
 using System.Security.Claims;
 using System.Linq;
+using PersonalShopper.DAL.Models;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace PersonalShopper.Controllers
 {
@@ -35,13 +38,120 @@ namespace PersonalShopper.Controllers
 
         //GET: api/Users/
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [AllowAnonymous]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _unitOfWork.Users.GetAll();
 
             return Ok(new { users });
         }
+
+        //GET: api/Users/carts
+        [HttpGet("cart")]
+        [AllowAnonymous]
+        //[Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllCarts()
+        {
+            var carts = await _unitOfWork.Carts.GetAll();
+
+            return Ok(new { carts });
+        }
+
+        //GET: api/Users/userCart/
+        [HttpGet("userCart")]
+        //[AllowAnonymous]
+        [Authorize(Roles = "Admin,User")]
+        public async Task<ActionResult<Cart>> RefreshUserCart()
+        {
+            var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserID == null)
+            {
+                return Forbid("No user currently logged in");
+            }
+
+            //var loggedUser = await _unitOfWork.Users.GetUserAndUserRoleById(int.Parse(currentUserID));
+            var userCart = await _unitOfWork.Carts.GetCartById(int.Parse(currentUserID));
+            //loggedUser.Cart = userCart;
+
+            /*await _unitOfWork.Users.Update(loggedUser);
+            _unitOfWork.Save();*/
+
+            return userCart;
+        }
+
+        /*// PUT: api/Users/updateUserCart
+        [HttpPut("updateUserCart")]
+        [Authorize(Roles = "Admin,User")]
+        public async Task<ActionResult<Cart>> UpdateUserCart()
+        {
+            var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserID == null)
+            {
+                return Forbid("No user currently logged in");
+            }
+
+            var userCart = await _unitOfWork.Carts.GetCartById(int.Parse(currentUserID));
+
+            if (userCart == null)
+            {
+                return NotFound("Cart not found for the current user");
+            }
+
+            var cartProductsList = await _unitOfWork.CartProducts.GetProductsByCartId(userCart.UserId);
+            userCart.CartProducts = new HashSet<CartProduct>(cartProductsList);
+
+            var loggedUser = await _unitOfWork.Users.GetUserAndUserRoleById(int.Parse(currentUserID));
+            userCart.User = loggedUser;
+
+            await _unitOfWork.Carts.Update(userCart);
+            _unitOfWork.Save();
+
+            // Configure JSON serialization options to ignore circular references
+            var jsonOptions = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+                MaxDepth = 32 // Adjust the max depth as needed
+            };
+
+            var json = JsonSerializer.Serialize(userCart, jsonOptions);
+
+            return Content(json, "application/json");
+        }*/
+
+
+        [HttpPut("updateUserCart")]
+        [Authorize(Roles = "Admin,User")]
+        public async Task<ActionResult<Cart>> UpdateUserCart()
+        {
+            var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserID == null)
+            {
+                return Forbid("No user currently logged in");
+            }
+
+            var userCart = await _unitOfWork.Carts.GetCartById(int.Parse(currentUserID));
+
+
+            if (userCart == null)
+            {
+                return NotFound("Cart not found for the current user");
+            }
+
+            // Retrieve cart products
+            var cartProductsList = await _unitOfWork.CartProducts.GetProductsByCartId(userCart.CartId);
+
+            // Create a new HashSet<CartProduct> from the list
+            userCart.CartProducts = new HashSet<CartProduct>(cartProductsList);
+
+            await _unitOfWork.Carts.Update(userCart);
+            _unitOfWork.Save();
+
+            return userCart;
+        }
+
+
+
 
         //PUT: api/Users/email/{userEmail}
         [HttpPut("email/{userEmail}")]

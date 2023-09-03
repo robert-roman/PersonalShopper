@@ -112,20 +112,29 @@ namespace PersonalShopper.Migrations
 
             modelBuilder.Entity("PersonalShopper.DAL.Models.Cart", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("CartId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CartId"), 1L, 1);
 
                     b.Property<float>("CartPrice")
                         .HasColumnType("real");
 
-                    b.HasKey("UserId");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CartId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Carts");
                 });
 
             modelBuilder.Entity("PersonalShopper.DAL.Models.CartProduct", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("CartId")
                         .HasColumnType("int")
                         .HasColumnOrder(0);
 
@@ -136,7 +145,7 @@ namespace PersonalShopper.Migrations
                     b.Property<int>("CartProductQuantity")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId", "ProductId");
+                    b.HasKey("CartId", "ProductId");
 
                     b.HasIndex("ProductId");
 
@@ -151,7 +160,7 @@ namespace PersonalShopper.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"), 1L, 1);
 
-                    b.Property<int>("OrderCartUserId")
+                    b.Property<int>("OrderCartCartId")
                         .HasColumnType("int");
 
                     b.Property<string>("OrderStatus")
@@ -163,7 +172,7 @@ namespace PersonalShopper.Migrations
 
                     b.HasKey("OrderId");
 
-                    b.HasIndex("OrderCartUserId");
+                    b.HasIndex("OrderCartCartId");
 
                     b.HasIndex("UserId");
 
@@ -426,7 +435,7 @@ namespace PersonalShopper.Migrations
                     b.HasOne("PersonalShopper.DAL.Models.User", "User")
                         .WithOne("Cart")
                         .HasForeignKey("PersonalShopper.DAL.Models.Cart", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -434,15 +443,15 @@ namespace PersonalShopper.Migrations
 
             modelBuilder.Entity("PersonalShopper.DAL.Models.CartProduct", b =>
                 {
-                    b.HasOne("PersonalShopper.DAL.Models.Product", "Product")
+                    b.HasOne("PersonalShopper.DAL.Models.Cart", "Cart")
                         .WithMany("CartProducts")
-                        .HasForeignKey("ProductId")
+                        .HasForeignKey("CartId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PersonalShopper.DAL.Models.Cart", "Cart")
+                    b.HasOne("PersonalShopper.DAL.Models.Product", "Product")
                         .WithMany("CartProducts")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -455,7 +464,7 @@ namespace PersonalShopper.Migrations
                 {
                     b.HasOne("PersonalShopper.DAL.Models.Cart", "OrderCart")
                         .WithMany()
-                        .HasForeignKey("OrderCartUserId")
+                        .HasForeignKey("OrderCartCartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
