@@ -6,24 +6,21 @@ using PersonalShopper.DAL.Utils;
 using PersonalShopper.DAL;
 using PersonalShopper.Repositories.UnitOfWork;
 using PersonalShopper.Services;
+using PersonalShopper.Services.UserService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
+using System.Collections.Generic;
 using System.Text;
-using PersonalShopper.DAL.Models.Constants;
-using PersonalShopper.DAL.Models;
-using PersonalShopper.DAL.Repositories.AuthWrapperRepository;
-using PersonalShopper.DAL.Seeders;
-using PersonalShopper.DAL;
-using PersonalShopper.Repositories.UnitOfWork;
-using PersonalShopper.Services;
+using PersonalShopper.Services.CartProductService;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -92,11 +89,12 @@ builder.Services.AddAuthentication(auth =>
     };
 });
 
-//Services for AuthWrapper and UserService
+// Services for AuthWrapper and Services folders
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthWrapperRepository, AuthWrapperRepository>();
 builder.Services.AddScoped<InitialSeed>();
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ICartProductService, CartProductService>();
 
 string constr = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<ApplicationDbContext>(x => x.UseSqlServer(constr));
@@ -110,21 +108,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
 using (var scope = app.Services.CreateScope())
 {
     var userRoles = scope.ServiceProvider.GetRequiredService<InitialSeed>();
 
     await userRoles.SeedRoles();
-
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

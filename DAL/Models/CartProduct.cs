@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace PersonalShopper.DAL.Models
 {
@@ -11,9 +12,9 @@ namespace PersonalShopper.DAL.Models
         [Key, Column(Order=1)]
         public int ProductId { get; set; }
         public int CartProductQuantity { get; set; }
-        [ForeignKey("ProductId")]
+        [ForeignKey("ProductId"), JsonIgnore]
         public Product? Product { get; set; }
-        [ForeignKey("CartId")]
+        [ForeignKey("CartId"), JsonIgnore]
         public Cart? Cart { get; set; }
     }
 }

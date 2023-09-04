@@ -77,7 +77,7 @@ namespace PersonalShopper.Controllers
             /*await _unitOfWork.Users.Update(loggedUser);
             _unitOfWork.Save();*/
 
-            return userCart;
+            return Ok();
         }
 
         /*// PUT: api/Users/updateUserCart
@@ -122,7 +122,7 @@ namespace PersonalShopper.Controllers
 
         [HttpPut("updateUserCart")]
         [Authorize(Roles = "Admin,User")]
-        public async Task<ActionResult<Cart>> UpdateUserCart()
+        public async Task<ActionResult> UpdateUserCart()
         {
             var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (currentUserID == null)
@@ -138,16 +138,14 @@ namespace PersonalShopper.Controllers
                 return NotFound("Cart not found for the current user");
             }
 
-            // Retrieve cart products
             var cartProductsList = await _unitOfWork.CartProducts.GetProductsByCartId(userCart.CartId);
+            userCart.CartProducts = cartProductsList;
 
-            // Create a new HashSet<CartProduct> from the list
-            userCart.CartProducts = new HashSet<CartProduct>(cartProductsList);
+            userCart.CartPrice = 1047;
 
             await _unitOfWork.Carts.Update(userCart);
-            _unitOfWork.Save();
-
-            return userCart;
+            var result =  _unitOfWork.Save();
+            return Ok();
         }
 
 

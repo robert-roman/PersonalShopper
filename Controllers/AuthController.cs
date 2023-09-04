@@ -7,6 +7,7 @@ using PersonalShopper.DAL;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using PersonalShopper.Services;
+using PersonalShopper.Services.UserService;
 
 namespace PersonalShopper.Controllers
 {

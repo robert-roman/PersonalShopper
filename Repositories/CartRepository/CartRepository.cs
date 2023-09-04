@@ -15,7 +15,7 @@ namespace PersonalShopper.Repositories.CartRepository
 
 
         public async Task<Cart> GetCartById(int id) =>
-            await _context.Carts.Where(cart => cart.CartId.Equals(id)).FirstOrDefaultAsync();
+            await _context.Carts.Include(x=>x.User).Include(x=> x.CartProducts).Where(cart => cart.CartId.Equals(id)).FirstOrDefaultAsync();
         public async Task<ActionResult<Cart>> GetProductFromCartByName(string productName)
         {
             try

@@ -10,7 +10,7 @@ namespace PersonalShopper.Repositories.CartProductRepository
     {
         public CartProductRepository(ApplicationDbContext context) : base(context) { }
 
-        public async Task<List<CartProduct>> GetProductsByCartId(int cartId) =>
+        public async Task<ICollection<CartProduct>> GetProductsByCartId(int cartId) =>
             await _context.CartProducts.Where(cp => cp.CartId.Equals(cartId)).ToListAsync();
     }
 }

@@ -9,7 +9,7 @@ using System.Security.Claims;
 using System.Text;
 using PersonalShopper.Repositories.UnitOfWork;
 
-namespace PersonalShopper.Services
+namespace PersonalShopper.Services.UserService
 {
     public class UserService : IUserService
     {

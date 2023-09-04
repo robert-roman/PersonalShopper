@@ -5,6 +5,6 @@ namespace PersonalShopper.Repositories.CartProductRepository
 {
     public interface ICartProductRepository : IGenericRepository<CartProduct>
     {
-        Task<List<CartProduct>> GetProductsByCartId (int cartId);
+        Task<ICollection<CartProduct>> GetProductsByCartId (int cartId);
     }
 }

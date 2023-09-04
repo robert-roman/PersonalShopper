@@ -1,4 +1,5 @@
-﻿using PersonalShopper.DAL;
+﻿using Microsoft.Data.SqlClient;
+using PersonalShopper.DAL;
 using PersonalShopper.Repositories.CartProductRepository;
 using PersonalShopper.Repositories.CartRepository;
 using PersonalShopper.Repositories.OrderRepository;
@@ -52,7 +53,14 @@ namespace PersonalShopper.Repositories.UnitOfWork
 
         public int Save()
         {
-            return _context.SaveChanges();
+            try
+            {
+                return _context.SaveChanges();
+            }
+            catch (SqlException e)
+            {
+                return 0;
+            }
         }
 
     }
