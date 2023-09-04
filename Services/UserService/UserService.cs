@@ -40,6 +40,7 @@ namespace PersonalShopper.Services.UserService
             {
                 var cart = new Cart
                 {
+                    UserId = registerUser.Id,
                     User = registerUser
                 };
 

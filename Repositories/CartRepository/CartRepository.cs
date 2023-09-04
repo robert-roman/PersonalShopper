@@ -22,11 +22,10 @@ namespace PersonalShopper.Repositories.CartRepository
             {
                 var dbContext = (ApplicationDbContext) _context;
 
-                // Search for the product in the cart by name
                 var cart = await dbContext.Carts
                     .Include(c => c.CartProducts)
                     .ThenInclude(cp => cp.Product)
-                    .Where(c => c.CartProducts.Any(cp => cp.Product.ProductName == productName)) // Change to ProductName
+                    .Where(c => c.CartProducts.Any(cp => cp.Product.ProductName == productName))
                     .FirstOrDefaultAsync();
 
                 if (cart != null)
@@ -35,15 +34,11 @@ namespace PersonalShopper.Repositories.CartRepository
                 }
                 else
                 {
-                    // If the cart or the product is not found, return a not found result
                     return new NotFoundResult();
                 }
             }
             catch (Exception ex)
             {
-                // Handle any exceptions here
-                // You can log the exception or return an appropriate response
-                // For simplicity, rethrowing the exception here
                 throw ex;
             }
         }

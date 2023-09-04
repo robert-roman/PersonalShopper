@@ -10,7 +10,7 @@ namespace PersonalShopper.DAL.Models
         public int UserId { get; set; }
         public User User { get; set; } = null!;
 
-        public ICollection<CartProduct>? CartProducts { get; set; }
+        public ICollection<CartProduct> CartProducts { get; set; }
         public float CartPrice { get; set; }
     }
 }

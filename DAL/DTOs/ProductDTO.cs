@@ -11,7 +11,7 @@ namespace PersonalShopper.DAL.DTOs
         public string ProductBrand { get; set; }
         public string ProductDescription { get; set; }
         public float ProductPrice { get; set; }
-        public int? ProductStock { get; set; }
+        public int ProductStock { get; set; }
 
         public ProductDTO() { }
         public ProductDTO(Product product)

@@ -6,6 +6,8 @@ namespace PersonalShopper.DAL.DTOs
     {
         public int CartId { get; set; }
         public int ProductId { get; set; }
+        public string ProductName { get; set; }
+        public float ProductPrice { get; set; }
         public int CartProductQuantity { get; set; }
 
         public CartProductDTO() { }
@@ -14,6 +16,8 @@ namespace PersonalShopper.DAL.DTOs
         {
             CartId = cartProduct.CartId;
             ProductId = cartProduct.ProductId;
+            ProductName = cartProduct.Product.ProductName;
+            ProductPrice = cartProduct.Product.ProductPrice;
             CartProductQuantity = cartProduct.CartProductQuantity;
         }
     }

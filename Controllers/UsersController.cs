@@ -77,7 +77,7 @@ namespace PersonalShopper.Controllers
             /*await _unitOfWork.Users.Update(loggedUser);
             _unitOfWork.Save();*/
 
-            return Ok();
+            return Ok(new CartDTO(userCart));
         }
 
         /*// PUT: api/Users/updateUserCart
@@ -145,7 +145,7 @@ namespace PersonalShopper.Controllers
 
             await _unitOfWork.Carts.Update(userCart);
             var result =  _unitOfWork.Save();
-            return Ok();
+            return Ok(new { userCart });
         }
 
 

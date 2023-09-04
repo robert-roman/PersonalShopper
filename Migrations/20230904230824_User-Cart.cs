@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PersonalShopper.Migrations
 {
-    public partial class databaseChange : Migration
+    public partial class UserCart : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -67,7 +67,7 @@ namespace PersonalShopper.Migrations
                     ProductBrand = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProductDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProductPrice = table.Column<float>(type: "real", nullable: false),
-                    ProductStock = table.Column<int>(type: "int", nullable: true)
+                    ProductStock = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

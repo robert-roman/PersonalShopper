@@ -206,7 +206,7 @@ namespace PersonalShopper.Migrations
                     b.Property<float>("ProductPrice")
                         .HasColumnType("real");
 
-                    b.Property<int?>("ProductStock")
+                    b.Property<int>("ProductStock")
                         .HasColumnType("int");
 
                     b.HasKey("ProductId");
@@ -537,8 +537,7 @@ namespace PersonalShopper.Migrations
 
             modelBuilder.Entity("PersonalShopper.DAL.Models.User", b =>
                 {
-                    b.Navigation("Cart")
-                        .IsRequired();
+                    b.Navigation("Cart");
 
                     b.Navigation("UserOrders");
 

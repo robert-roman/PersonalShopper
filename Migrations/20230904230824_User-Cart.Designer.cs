@@ -12,8 +12,8 @@ using PersonalShopper.DAL;
 namespace PersonalShopper.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230903102826_databaseChange")]
-    partial class databaseChange
+    [Migration("20230904230824_User-Cart")]
+    partial class UserCart
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -208,7 +208,7 @@ namespace PersonalShopper.Migrations
                     b.Property<float>("ProductPrice")
                         .HasColumnType("real");
 
-                    b.Property<int?>("ProductStock")
+                    b.Property<int>("ProductStock")
                         .HasColumnType("int");
 
                     b.HasKey("ProductId");
@@ -539,8 +539,7 @@ namespace PersonalShopper.Migrations
 
             modelBuilder.Entity("PersonalShopper.DAL.Models.User", b =>
                 {
-                    b.Navigation("Cart")
-                        .IsRequired();
+                    b.Navigation("Cart");
 
                     b.Navigation("UserOrders");
 
