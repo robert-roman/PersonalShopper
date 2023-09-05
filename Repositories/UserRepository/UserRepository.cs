@@ -10,13 +10,20 @@ namespace PersonalShopper.Repositories.UserRepository
         public UserRepository(ApplicationDbContext context) : base(context) { }
 
         public async Task<List<User>> GetAllUsersAsync() =>
-        await _context.Users.ToListAsync();
-        public async Task<User> GetUserAndUserRoleById(int userId) =>
-            await _context.Users.Include(user => user.UserRoles).ThenInclude(ur => ur.Role).FirstOrDefaultAsync(u => u.Id.Equals(userId));
+        await _context.Users.Include(x => x.Cart).ThenInclude(y => y.CartProducts).ThenInclude(z => z.Product)
+                            .Include(x => x.UserOrders)
+                            .Include(x => x.UserRoles).ThenInclude(y => y.Role)
+                            .ToListAsync();
+        public async Task<User> GetUserById(int userId) =>
+            await _context.Users.Include(x => x.Cart).ThenInclude(y => y.CartProducts).ThenInclude(z => z.Product)
+                                .Include(x => x.UserOrders)
+                                .Include(x => x.UserRoles).ThenInclude(y => y.Role)
+                                .FirstOrDefaultAsync(u => u.Id.Equals(userId));
 
         public async Task<User> GetUserByEmail(string email) =>
             await _context.Users.Include(x => x.Cart).ThenInclude(y => y.CartProducts).ThenInclude(z => z.Product)
                                 .Include(x => x.UserOrders)
+                                .Include(x => x.UserRoles).ThenInclude(y => y.Role)
                                 .Where(user => user.Email.Equals(email)).FirstOrDefaultAsync();
     }
 }

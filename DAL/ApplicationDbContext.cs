@@ -38,11 +38,19 @@ namespace PersonalShopper.DAL
                 .HasOne(cartProduct => cartProduct.Cart)
                 .WithMany(cart => cart.CartProducts)
                 .OnDelete(DeleteBehavior.Restrict);
-
             modelBuilder.Entity<CartProduct>()
                 .HasOne(cartProduct => cartProduct.Product)
                 .WithMany(product => product.CartProducts)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<CartProduct>()
+                .HasKey(cp => new { cp.CartId, cp.ProductId });
+
+            modelBuilder.Entity<Order>()
+                .HasMany(order => order.OrderProducts);
+
+            modelBuilder.Entity<OrderProduct>()
+                .HasKey(op => new { op.OrderId, op.ProductId });
+
 
             modelBuilder.Entity<UserRole>(ur =>
             {

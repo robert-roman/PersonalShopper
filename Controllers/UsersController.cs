@@ -92,7 +92,7 @@ namespace PersonalShopper.Controllers
                 return Forbid("No user currently logged in");
             }
             
-            var loggedUser = await _unitOfWork.Users.GetUserAndUserRoleById(int.Parse(currentUserID));
+            var loggedUser = await _unitOfWork.Users.GetUserById(int.Parse(currentUserID));
             if (!loggedUser.Email.Equals(userEmail) && !loggedUser.UserRoles.Any(ur => ur.Role.Name == "Admin"))
             {
                 return Forbid("You are not authorized to edit other users' profile");

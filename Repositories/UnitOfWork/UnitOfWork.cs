@@ -2,6 +2,7 @@
 using PersonalShopper.DAL;
 using PersonalShopper.Repositories.CartProductRepository;
 using PersonalShopper.Repositories.CartRepository;
+using PersonalShopper.Repositories.OrderProductRepository;
 using PersonalShopper.Repositories.OrderRepository;
 using PersonalShopper.Repositories.ProductRepository;
 using PersonalShopper.Repositories.UserRepository;
@@ -46,6 +47,12 @@ namespace PersonalShopper.Repositories.UnitOfWork
         }
 
         public IUserRepository Users
+        {
+            get;
+            private set;
+        }
+
+        public IOrderProductRepository OrderProducts
         {
             get;
             private set;

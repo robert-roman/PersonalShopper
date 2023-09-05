@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using PersonalShopper.DAL.DTOs;
 using PersonalShopper.DAL.Models;
 using PersonalShopper.Repositories.UnitOfWork;
+using PersonalShopper.Services.OrderService;
+using PersonalShopper.Services.UserService;
 using System.Security.Claims;
 
 namespace PersonalShopper.Controllers
@@ -12,9 +14,12 @@ namespace PersonalShopper.Controllers
     public class OrdersController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        public OrdersController(IUnitOfWork unitOfWork)
+        private readonly IOrderService _orderService;
+
+        public OrdersController(IUnitOfWork unitOfWork, IOrderService orderService)
         {
             _unitOfWork = unitOfWork;
+            _orderService = orderService;
         }
 
         //GET: api/Orders/status
@@ -50,7 +55,7 @@ namespace PersonalShopper.Controllers
                 return Forbid("No user currently logged in");
             }
 
-            var loggedUser = await _unitOfWork.Users.GetUserAndUserRoleById(int.Parse(currentUserID));
+            var loggedUser = await _unitOfWork.Users.GetUserById(int.Parse(currentUserID));
             if (!searchedOrder.UserId.Equals(loggedUser.Id) && !loggedUser.UserRoles.Any(ur => ur.Role.Name == "Admin"))
             {
                 return Forbid("Regular users can see only their orders");
@@ -71,7 +76,7 @@ namespace PersonalShopper.Controllers
                 return Forbid("No user currently logged in");
             }
 
-            var loggedUser = await _unitOfWork.Users.GetUserAndUserRoleById(int.Parse(currentUserID));
+            var loggedUser = await _unitOfWork.Users.GetUserById(int.Parse(currentUserID));
             if (!loggedUser.Email.Equals(userEmail) && !loggedUser.UserRoles.Any(ur => ur.Role.Name == "Admin"))
             {
                 return Forbid("Regular users can see only their orders");
@@ -99,7 +104,7 @@ namespace PersonalShopper.Controllers
                 return Forbid("No user currently logged in");
             }
 
-            var loggedUser = await _unitOfWork.Users.GetUserAndUserRoleById(int.Parse(currentUserID));
+            var loggedUser = await _unitOfWork.Users.GetUserById(int.Parse(currentUserID));
             if (loggedUser == null)
             {
                 return NotFound("User not found");
@@ -109,13 +114,21 @@ namespace PersonalShopper.Controllers
 
             var orderToPlace = new Order();
             orderToPlace.UserId = loggedUser.Id;
-            orderToPlace.OrderCart = orderCart;
+            orderToPlace.User = loggedUser;
+            orderToPlace.OrderPlaceDate = DateTime.Now;
             orderToPlace.OrderStatus = "Placed";
+
+            var allOrderProducts = await _orderService.CreateOrderProducts(orderToPlace);
+            
+            if (allOrderProducts == null)
+                return BadRequest("The cart is empty. You need at least 1 product in cart to place an order");
+
+            orderToPlace.OrderProducts = allOrderProducts;
 
             await _unitOfWork.Orders.Create(orderToPlace);
             _unitOfWork.Save();
-
-            return new OrderDTO(orderToPlace);
+            var orderDTO = new OrderDTO(orderToPlace);
+            return orderDTO;
         }
 
         //PUT: api/Orders

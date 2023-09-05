@@ -16,5 +16,6 @@ namespace PersonalShopper.DAL.Models
         public Product Product { get; set; }
         [ForeignKey("CartId")]
         public Cart Cart { get; set; }
+
     }
 }

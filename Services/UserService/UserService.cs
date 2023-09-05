@@ -65,7 +65,7 @@ namespace PersonalShopper.Services.UserService
 
             if (user != null)
             {
-                user = await _repository.User.GetUserAndUserRoleById(user.Id);
+                user = await _repository.User.GetUserById(user.Id);
                 List<string> roles = user.UserRoles.Select(ur => ur.Role.Name).ToList();
 
                 var newJti = Guid.NewGuid().ToString();

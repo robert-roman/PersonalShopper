@@ -3,7 +3,9 @@ using PersonalShopper.DAL.Models;
 
 namespace PersonalShopper.Services.CartProductService
 {
-    public interface ICartProductService
+    public interface ICartService
     {
+        Task ClearCart(Cart boughtCart);
+        Task<float> CalculateCartPrice(Cart cart);
     }
 }

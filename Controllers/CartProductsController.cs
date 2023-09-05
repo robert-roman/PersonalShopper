@@ -52,6 +52,14 @@ namespace PersonalShopper.Controllers
         [Authorize(Roles = "Admin,User")]
         public async Task<ActionResult<CartProductDTO>> AddCartProduct(int productId, int productQuantity)
         {
+
+            var searchedProduct = await _unitOfWork.Products.GetById(productId);
+            if (searchedProduct == null)
+            {
+                return NotFound("No product registred with this id");
+            }    
+
+
             var currentUserID = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (currentUserID == null)
             {
@@ -77,6 +85,8 @@ namespace PersonalShopper.Controllers
                 cartProductToAdd.ProductId = productId;
                 cartProductToAdd.CartId = currentUserID;
                 cartProductToAdd.CartProductQuantity = productQuantity;
+                cartProductToAdd.Cart = userCart;
+                cartProductToAdd.Product = searchedProduct;
 
                 await _unitOfWork.CartProducts.Create(cartProductToAdd);
 

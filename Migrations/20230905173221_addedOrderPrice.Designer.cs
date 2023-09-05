@@ -12,8 +12,8 @@ using PersonalShopper.DAL;
 namespace PersonalShopper.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230904230824_User-Cart")]
-    partial class UserCart
+    [Migration("20230905173221_addedOrderPrice")]
+    partial class addedOrderPrice
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -162,8 +162,11 @@ namespace PersonalShopper.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"), 1L, 1);
 
-                    b.Property<int>("OrderCartCartId")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("OrderPlaceDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<float>("OrderPrice")
+                        .HasColumnType("real");
 
                     b.Property<string>("OrderStatus")
                         .IsRequired()
@@ -174,11 +177,34 @@ namespace PersonalShopper.Migrations
 
                     b.HasKey("OrderId");
 
-                    b.HasIndex("OrderCartCartId");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("PersonalShopper.DAL.Models.OrderProduct", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
+
+                    b.Property<int>("OrderProductQuantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("ProductPrice")
+                        .HasColumnType("real");
+
+                    b.HasKey("OrderId", "ProductId");
+
+                    b.ToTable("OrderProduct");
                 });
 
             modelBuilder.Entity("PersonalShopper.DAL.Models.Product", b =>
@@ -464,21 +490,22 @@ namespace PersonalShopper.Migrations
 
             modelBuilder.Entity("PersonalShopper.DAL.Models.Order", b =>
                 {
-                    b.HasOne("PersonalShopper.DAL.Models.Cart", "OrderCart")
-                        .WithMany()
-                        .HasForeignKey("OrderCartCartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("PersonalShopper.DAL.Models.User", "User")
                         .WithMany("UserOrders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("OrderCart");
-
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PersonalShopper.DAL.Models.OrderProduct", b =>
+                {
+                    b.HasOne("PersonalShopper.DAL.Models.Order", null)
+                        .WithMany("OrderProducts")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PersonalShopper.DAL.Models.RefreshToken", b =>
@@ -525,6 +552,11 @@ namespace PersonalShopper.Migrations
             modelBuilder.Entity("PersonalShopper.DAL.Models.Cart", b =>
                 {
                     b.Navigation("CartProducts");
+                });
+
+            modelBuilder.Entity("PersonalShopper.DAL.Models.Order", b =>
+                {
+                    b.Navigation("OrderProducts");
                 });
 
             modelBuilder.Entity("PersonalShopper.DAL.Models.Product", b =>

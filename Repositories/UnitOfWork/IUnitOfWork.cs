@@ -3,6 +3,7 @@ using PersonalShopper.Repositories.CartRepository;
 using PersonalShopper.Repositories.UserRepository;
 using PersonalShopper.Repositories.CartProductRepository;
 using PersonalShopper.Repositories.OrderRepository;
+using PersonalShopper.Repositories.OrderProductRepository;
 
 namespace PersonalShopper.Repositories.UnitOfWork
 {
@@ -13,6 +14,7 @@ namespace PersonalShopper.Repositories.UnitOfWork
         ICartProductRepository CartProducts { get;  }
         IUserRepository Users { get; }
         IOrderRepository Orders { get; }
+        IOrderProductRepository OrderProducts { get;  }
 
         int Save();
     }
