@@ -75,6 +75,20 @@ namespace PersonalShopper.Controllers
             return searchedProducts.Select(p => new ProductDTO(p)).ToList();
         }
 
+
+        //GET: api/Products/SeePricesAndSales
+        [HttpGet("SeePricesAndSales")]
+        [Authorize(Roles ="Admin")]
+        public async Task<ActionResult<List<(int ProductId, string ProductName, float ProductPrice,
+                                            float OrderProductPrice, int OrderProductQuantity)>>>
+                         SeePricesAndSales()
+        {
+            var comparisons = await _unitOfWork.OrderProducts.ComparePricesForAProduct();
+            return comparisons;
+        }
+
+
+
         //POST: api/Products
         [HttpPost]
         [Authorize(Roles ="Admin")]

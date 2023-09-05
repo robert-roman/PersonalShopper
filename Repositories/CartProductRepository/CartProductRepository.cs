@@ -17,7 +17,7 @@ namespace PersonalShopper.Repositories.CartProductRepository
 
         public async Task<ICollection<CartProduct>> GroupProductsFromCartByCategory(int cartId)
         {
-            var dbContext = (ApplicationDbContext)_context;
+            var dbContext = (ApplicationDbContext) _context;
             var productsInSearchedCart = await dbContext.CartProducts.Include(cp => cp.Product)
                                                                      .Where(cp => cp.CartId == cartId)
                                                                      .ToListAsync();

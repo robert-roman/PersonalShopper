@@ -10,10 +10,10 @@ namespace PersonalShopper.Repositories.UserRepository
         public UserRepository(ApplicationDbContext context) : base(context) { }
 
         public async Task<List<User>> GetAllUsersAsync() =>
-        await _context.Users.Include(x => x.Cart).ThenInclude(y => y.CartProducts).ThenInclude(z => z.Product)
-                            .Include(x => x.UserOrders)
-                            .Include(x => x.UserRoles).ThenInclude(y => y.Role)
-                            .ToListAsync();
+            await _context.Users.Include(x => x.Cart).ThenInclude(y => y.CartProducts).ThenInclude(z => z.Product)
+                                .Include(x => x.UserOrders)
+                                .Include(x => x.UserRoles).ThenInclude(y => y.Role)
+                                .ToListAsync();
         public async Task<User> GetUserById(int userId) =>
             await _context.Users.Include(x => x.Cart).ThenInclude(y => y.CartProducts).ThenInclude(z => z.Product)
                                 .Include(x => x.UserOrders)

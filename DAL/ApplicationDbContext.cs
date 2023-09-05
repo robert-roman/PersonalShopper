@@ -16,6 +16,7 @@ namespace PersonalShopper.DAL
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartProduct> CartProducts { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderProduct> OrdersProducts { get; set; }
         public DbSet<SessionToken> SessionTokens { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 

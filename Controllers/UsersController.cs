@@ -49,14 +49,14 @@ namespace PersonalShopper.Controllers
             {
                 return NotFound();
             }
-            var results = (await _unitOfWork.Users.GetAll()).Select(u => new UserProfileDTO(u)).ToList();
+            var results = (await _unitOfWork.Users.GetAllUsersAsync()).Select(u => new UserProfileDTO(u)).ToList();
             return results;
         }
 
 
         //GET: api/Users/userCart/
         [HttpGet("userCart")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Admin,User")]
         public async Task<ActionResult<CartDTO>> RefreshCart()
         {
             var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -82,6 +82,12 @@ namespace PersonalShopper.Controllers
         public async Task<ActionResult<CartDTO>> RefreshCartUser(int userId)
         {
             var userCart = await _unitOfWork.Carts.GetCartById(userId);
+
+            if (userCart == null)
+            {
+                return NotFound("No cart registred with this id");
+            }
+
             await _cartService.CalculateCartPrice(userCart);
 
             var userCartDTO = new CartDTO(userCart);
@@ -94,7 +100,7 @@ namespace PersonalShopper.Controllers
         //PUT: api/Users/email/{userEmail}
         [HttpPut("email/{userEmail}")]
         [Authorize(Roles = "Admin,User")]
-        public async Task<ActionResult<UserRegisterDTO>> ModifyUserProfile(string userEmail, UserRegisterDTO userModified)
+        public async Task<ActionResult<UserProfileDTO>> ModifyUserProfile(string userEmail, UserRegisterDTO userModified)
         {
             var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (currentUserID == null)
@@ -108,14 +114,18 @@ namespace PersonalShopper.Controllers
                 return Forbid("You are not authorized to edit other users' profile");
             }
 
-            loggedUser.Email = userModified.Email;
-            loggedUser.FirstName = userModified.FirstName;
-            loggedUser.LastName = userModified.LastName;
+            var searchedUser = await _unitOfWork.Users.GetUserByEmail(userEmail);
 
-            await _unitOfWork.Users.Update(loggedUser);
+            searchedUser.FirstName = userModified.FirstName;
+            searchedUser.LastName = userModified.LastName;
+            searchedUser.Age = userModified.Age;
+            await _cartService.CalculateCartPrice(searchedUser.Cart);
+
+            await _unitOfWork.Users.Update(searchedUser);
             _unitOfWork.Save();
 
-            return Ok(loggedUser);
+            var searchedUserDTO = new UserProfileDTO(searchedUser);
+            return searchedUserDTO;
 
         }
 

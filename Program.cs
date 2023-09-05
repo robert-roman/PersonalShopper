@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Text;
 using PersonalShopper.Services.CartProductService;
 using PersonalShopper.Services.OrderService;
+using PersonalShopper.Repositories.OrderProductRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -101,6 +102,9 @@ builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICartService, CartService>();
 //builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderProductRepository, OrderProductRepository>();
+
+
 
 
 string constr = builder.Configuration.GetConnectionString("Default");
