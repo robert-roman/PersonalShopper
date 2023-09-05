@@ -115,7 +115,7 @@ namespace PersonalShopper.Controllers
             await _unitOfWork.Orders.Create(orderToPlace);
             _unitOfWork.Save();
 
-            return Ok(orderToPlace);
+            return new OrderDTO(orderToPlace);
         }
 
         //PUT: api/Orders

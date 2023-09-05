@@ -7,14 +7,14 @@ namespace PersonalShopper.DAL.DTOs
     {
         public int OrderId { get; set; }
         public int UserId { get; set; }
-        public Cart OrderCart { get; set; }
+        public CartDTO OrderCart { get; set; }
         public string OrderStatus { get; set; }
 
         public OrderDTO(Order order)
         {
             OrderId = order.OrderId;
             UserId = order.UserId;
-            OrderCart = order.OrderCart;
+            OrderCart = new CartDTO(order.OrderCart);
             OrderStatus = order.OrderStatus;
         }
     }

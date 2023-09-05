@@ -38,8 +38,7 @@ namespace PersonalShopper.Controllers
 
         //GET: api/Users/
         [HttpGet]
-        [AllowAnonymous]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<UserProfileDTO>>> GetAllUsers()
         {
             if (_unitOfWork.Users == null)
