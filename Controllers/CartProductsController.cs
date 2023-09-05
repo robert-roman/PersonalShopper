@@ -17,10 +17,26 @@ namespace PersonalShopper.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        //GET: api/CartProduct/{CartId}
+        //GET: api/CartProduct/
         [HttpGet]
-        [Authorize(Roles = "Admin,User")]
-        public async Task<IActionResult> GetCartProducts(int cartId)
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> GetProductsFromCart()
+        {
+            var currentUserID = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            if (_unitOfWork.CartProducts == null)
+            {
+                return NotFound();
+            }
+            var result = (await _unitOfWork.CartProducts.GetProductsByCartId(currentUserID)).Select(cp => new CartProductDTO(cp)).ToList();
+
+            return Ok(result);
+        }
+
+        //GET: api/CartProduct/{cartId}
+        [HttpGet("{cartId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetProductsFromCart(int cartId)
         {
             if (_unitOfWork.CartProducts == null)
             {
@@ -34,24 +50,44 @@ namespace PersonalShopper.Controllers
         //POST: api/CartProducts
         [HttpPost]
         [Authorize(Roles = "Admin,User")]
-        public async Task<ActionResult<CartProductDTO>> AddCartProduct(CartProductDTO cartProduct)
+        public async Task<ActionResult<CartProductDTO>> AddCartProduct(int productId, int productQuantity)
         {
-            var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUserID = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (currentUserID == null)
             {
                 return Forbid("No user currently logged in");
             }
 
+            var userCart = await _unitOfWork.Carts.GetCartById(currentUserID);
 
-            var cartProductToAdd = new CartProduct();
-            cartProductToAdd.ProductId = cartProduct.ProductId;
-            cartProductToAdd.CartId = int.Parse(currentUserID);
-            cartProductToAdd.CartProductQuantity = cartProduct.CartProductQuantity;
+            var existingCartProduct = await _unitOfWork.CartProducts.GetByComposedId(currentUserID, productId);
+            if (existingCartProduct != null)
+            {
+                existingCartProduct.CartProductQuantity += productQuantity;
+                await _unitOfWork.CartProducts.Update(existingCartProduct);
+                _unitOfWork.Save();
 
-            await _unitOfWork.CartProducts.Create(cartProductToAdd);
-            _unitOfWork.Save();
+                var cpDTO = await _unitOfWork.CartProducts.GetCartProductDTO(existingCartProduct);
+                return cpDTO;
+            }
 
-            return Ok(cartProductToAdd);
+            else
+            {
+                var cartProductToAdd = new CartProduct();
+                cartProductToAdd.ProductId = productId;
+                cartProductToAdd.CartId = currentUserID;
+                cartProductToAdd.CartProductQuantity = productQuantity;
+
+                await _unitOfWork.CartProducts.Create(cartProductToAdd);
+
+                userCart.CartProducts.Add(cartProductToAdd);
+                await _unitOfWork.Carts.Update(userCart);
+                _unitOfWork.Save();
+
+                var cpDTO = await _unitOfWork.CartProducts.GetCartProductDTO(cartProductToAdd);
+                return cpDTO;
+
+            }
         }
 
         //PUT: api/CartProducts
@@ -82,21 +118,50 @@ namespace PersonalShopper.Controllers
 
         //DELETE: api/CartProducts
         [HttpDelete]
-        [Authorize(Roles ="Admin,User")]
-        public async Task<IActionResult> DeleteCartProduct(int userId, int productId)
+        [Authorize(Roles ="User")]
+        public async Task<IActionResult> RemoveProductFromCart(int productId)
         {
-            var existingCartProduct = await _unitOfWork.CartProducts.GetByComposedId(userId, productId);
+            var currentUserID = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+
+            var existingCartProduct = await _unitOfWork.CartProducts.GetByComposedId(currentUserID, productId);
 
             if (existingCartProduct == null)
             {
                 return NotFound("Searched product not present in selected cart");
             }
 
+            var userCart = await _unitOfWork.Carts.GetCartById(currentUserID);
+            userCart.CartProducts.Remove(existingCartProduct);
+            await _unitOfWork.Carts.Update(userCart);
             await _unitOfWork.CartProducts.Delete(existingCartProduct);
             _unitOfWork.Save();
 
             return Ok();
         }
-    
+
+        //DELETE: api/CartProducts/cartId/{cartId}
+        [HttpDelete("cartId/{cartId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RemoveProductFromUserCart(int productId, int cartId)
+        {
+
+
+            var existingCartProduct = await _unitOfWork.CartProducts.GetByComposedId(cartId, productId);
+
+            if (existingCartProduct == null)
+            {
+                return NotFound("Searched product not present in selected cart");
+            }
+
+            var userCart = await _unitOfWork.Carts.GetCartById(cartId);
+            userCart.CartProducts.Remove(existingCartProduct);
+            await _unitOfWork.Carts.Update(userCart);
+            await _unitOfWork.CartProducts.Delete(existingCartProduct);
+            _unitOfWork.Save();
+
+            return Ok();
+        }
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using PersonalShopper.DAL.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using PersonalShopper.DAL.Models;
 
 namespace PersonalShopper.DAL.DTOs
 {
@@ -19,6 +20,11 @@ namespace PersonalShopper.DAL.DTOs
             ProductName = cartProduct.Product.ProductName;
             ProductPrice = cartProduct.Product.ProductPrice;
             CartProductQuantity = cartProduct.CartProductQuantity;
+        }
+
+        public static implicit operator CartProductDTO(ActionResult<CartProductDTO> v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

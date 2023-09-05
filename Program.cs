@@ -5,6 +5,7 @@ using PersonalShopper.DAL.Seeders;
 using PersonalShopper.DAL.Utils;
 using PersonalShopper.DAL;
 using PersonalShopper.Repositories.UnitOfWork;
+using PersonalShopper.Repositories.CartRepository;
 using PersonalShopper.Services;
 using PersonalShopper.Services.UserService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -95,6 +96,7 @@ builder.Services.AddScoped<IAuthWrapperRepository, AuthWrapperRepository>();
 builder.Services.AddScoped<InitialSeed>();
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICartProductService, CartProductService>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
 
 string constr = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<ApplicationDbContext>(x => x.UseSqlServer(constr));
