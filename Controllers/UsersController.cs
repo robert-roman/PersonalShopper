@@ -62,7 +62,7 @@ namespace PersonalShopper.Controllers
         [HttpGet("userCart")]
         //[AllowAnonymous]
         [Authorize(Roles = "Admin,User")]
-        public async Task<ActionResult<Cart>> RefreshUserCart()
+        public async Task<ActionResult<CartDTO>> RefreshUserCart()
         {
             var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (currentUserID == null)
@@ -70,14 +70,10 @@ namespace PersonalShopper.Controllers
                 return Forbid("No user currently logged in");
             }
 
-            //var loggedUser = await _unitOfWork.Users.GetUserAndUserRoleById(int.Parse(currentUserID));
             var userCart = await _unitOfWork.Carts.GetCartById(int.Parse(currentUserID));
-            //loggedUser.Cart = userCart;
+            var userCartDTO = new CartDTO(userCart);
 
-            /*await _unitOfWork.Users.Update(loggedUser);
-            _unitOfWork.Save();*/
-
-            return Ok(new CartDTO(userCart));
+            return userCartDTO;
         }
 
         /*// PUT: api/Users/updateUserCart

@@ -6,14 +6,14 @@ namespace PersonalShopper.DAL.DTOs
     {
         public int CartId { get; set; }
         public int UserId { get; set; }
-        public ICollection<CartProduct> CartProducts { get; set; }
+        public ICollection<CartProductDTO> CartProducts { get; set; }
         public float CartPrice { get; set; }
 
         public CartDTO(Cart cart)
         {
             CartId = cart.CartId;
             UserId = cart.UserId;
-            CartProducts = cart.CartProducts;
+            CartProducts = cart.CartProducts.Select(cp => new CartProductDTO(cp)).ToList();
             CartPrice = cart.CartPrice;
         }
     }
