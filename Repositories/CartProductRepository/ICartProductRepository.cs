@@ -8,6 +8,5 @@ namespace PersonalShopper.Repositories.CartProductRepository
     public interface ICartProductRepository : IGenericRepository<CartProduct>
     {
         Task<ICollection<CartProduct>> GetProductsByCartId (int cartId);
-        Task<ActionResult<CartProductDTO>> GetCartProductDTO(CartProduct cp);
     }
 }

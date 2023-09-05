@@ -67,7 +67,7 @@ namespace PersonalShopper.Controllers
                 await _unitOfWork.CartProducts.Update(existingCartProduct);
                 _unitOfWork.Save();
 
-                var cpDTO = await _unitOfWork.CartProducts.GetCartProductDTO(existingCartProduct);
+                var cpDTO = new CartProductDTO(existingCartProduct);
                 return cpDTO;
             }
 
@@ -84,7 +84,7 @@ namespace PersonalShopper.Controllers
                 await _unitOfWork.Carts.Update(userCart);
                 _unitOfWork.Save();
 
-                var cpDTO = await _unitOfWork.CartProducts.GetCartProductDTO(cartProductToAdd);
+                var cpDTO = new CartProductDTO(cartProductToAdd);
                 return cpDTO;
 
             }

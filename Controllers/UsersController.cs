@@ -24,7 +24,7 @@ namespace PersonalShopper.Controllers
         //GET: api/Users/{email}
         [HttpGet("{email}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetUserByEmail(string email)
+        public async Task<ActionResult<UserProfileDTO>> GetUserByEmail(string email)
         {
             var user = await _unitOfWork.Users.GetUserByEmail(email);
 
@@ -33,36 +33,28 @@ namespace PersonalShopper.Controllers
                 return NotFound("There is no user with this email");
             }
 
-            return Ok(user);
+            return new UserProfileDTO(user);
         }
 
         //GET: api/Users/
         [HttpGet]
         [AllowAnonymous]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<ActionResult<IEnumerable<UserProfileDTO>>> GetAllUsers()
         {
-            var users = await _unitOfWork.Users.GetAll();
-
-            return Ok(new { users });
+            if (_unitOfWork.Users == null)
+            {
+                return NotFound();
+            }
+            var results = (await _unitOfWork.Users.GetAll()).Select(u => new UserProfileDTO(u)).ToList();
+            return results;
         }
 
-        //GET: api/Users/carts
-        [HttpGet("cart")]
-        [AllowAnonymous]
-        //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllCarts()
-        {
-            var carts = await _unitOfWork.Carts.GetAll();
-
-            return Ok(new { carts });
-        }
 
         //GET: api/Users/userCart/
         [HttpGet("userCart")]
-        //[AllowAnonymous]
-        [Authorize(Roles = "Admin,User")]
-        public async Task<ActionResult<CartDTO>> RefreshUserCart()
+        [Authorize(Roles = "User")]
+        public async Task<ActionResult<CartDTO>> RefreshCart()
         {
             var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (currentUserID == null)
@@ -76,72 +68,15 @@ namespace PersonalShopper.Controllers
             return userCartDTO;
         }
 
-        /*// PUT: api/Users/updateUserCart
-        [HttpPut("updateUserCart")]
-        [Authorize(Roles = "Admin,User")]
-        public async Task<ActionResult<Cart>> UpdateUserCart()
+        //GET: api/Users/userCart/{userId}
+        [HttpGet("userCart/{userId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<CartDTO>> RefreshCartUser(int userId)
         {
-            var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (currentUserID == null)
-            {
-                return Forbid("No user currently logged in");
-            }
+            var userCart = await _unitOfWork.Carts.GetCartById(userId);
+            var userCartDTO = new CartDTO(userCart);
 
-            var userCart = await _unitOfWork.Carts.GetCartById(int.Parse(currentUserID));
-
-            if (userCart == null)
-            {
-                return NotFound("Cart not found for the current user");
-            }
-
-            var cartProductsList = await _unitOfWork.CartProducts.GetProductsByCartId(userCart.UserId);
-            userCart.CartProducts = new HashSet<CartProduct>(cartProductsList);
-
-            var loggedUser = await _unitOfWork.Users.GetUserAndUserRoleById(int.Parse(currentUserID));
-            userCart.User = loggedUser;
-
-            await _unitOfWork.Carts.Update(userCart);
-            _unitOfWork.Save();
-
-            // Configure JSON serialization options to ignore circular references
-            var jsonOptions = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve,
-                MaxDepth = 32 // Adjust the max depth as needed
-            };
-
-            var json = JsonSerializer.Serialize(userCart, jsonOptions);
-
-            return Content(json, "application/json");
-        }*/
-
-
-        [HttpPut("updateUserCart")]
-        [Authorize(Roles = "Admin,User")]
-        public async Task<ActionResult> UpdateUserCart()
-        {
-            var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (currentUserID == null)
-            {
-                return Forbid("No user currently logged in");
-            }
-
-            var userCart = await _unitOfWork.Carts.GetCartById(int.Parse(currentUserID));
-
-
-            if (userCart == null)
-            {
-                return NotFound("Cart not found for the current user");
-            }
-
-            var cartProductsList = await _unitOfWork.CartProducts.GetProductsByCartId(userCart.CartId);
-            userCart.CartProducts = cartProductsList;
-
-            userCart.CartPrice = 1047;
-
-            await _unitOfWork.Carts.Update(userCart);
-            var result =  _unitOfWork.Save();
-            return Ok(new { userCart });
+            return userCartDTO;
         }
 
 

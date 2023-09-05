@@ -8,8 +8,8 @@ namespace PersonalShopper.DAL.DTOs
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int Age { get; set; }
-        public Cart? Cart { get; set; }
-        public virtual ICollection<Order> UserOrders { get; set; }
+        public CartDTO? Cart { get; set; }
+        public virtual ICollection<OrderDTO> UserOrders { get; set; }
 
         public UserProfileDTO(User user)
         {
@@ -17,8 +17,8 @@ namespace PersonalShopper.DAL.DTOs
             FirstName = user.FirstName;
             LastName = user.LastName;
             Age = user.Age;
-            Cart = user.Cart;
-            UserOrders = user.UserOrders;
+            Cart = new CartDTO(user.Cart);
+            UserOrders = user.UserOrders.Select( uo => new OrderDTO(uo)).ToList();
         }
     }
 }

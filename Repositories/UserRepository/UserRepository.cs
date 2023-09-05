@@ -15,6 +15,8 @@ namespace PersonalShopper.Repositories.UserRepository
             await _context.Users.Include(user => user.UserRoles).ThenInclude(ur => ur.Role).FirstOrDefaultAsync(u => u.Id.Equals(userId));
 
         public async Task<User> GetUserByEmail(string email) =>
-            await _context.Users.Where(user => user.Email.Equals(email)).FirstOrDefaultAsync();
+            await _context.Users.Include(x => x.Cart).ThenInclude(y => y.CartProducts).ThenInclude(z => z.Product)
+                                .Include(x => x.UserOrders)
+                                .Where(user => user.Email.Equals(email)).FirstOrDefaultAsync();
     }
 }
