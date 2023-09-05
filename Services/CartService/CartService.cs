@@ -8,7 +8,7 @@ namespace PersonalShopper.Services.CartProductService
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public async Task ClearCart(Cart boughtCart)
+        /*public async Task ClearCart(Cart boughtCart)
         { 
             foreach (CartProduct boughtProduct in boughtCart.CartProducts)
             {
@@ -17,11 +17,14 @@ namespace PersonalShopper.Services.CartProductService
             boughtCart.CartPrice = 0;
             boughtCart.CartProducts.Clear();
             _unitOfWork.Save();
-        }
+        }*/
 
-        public async Task<float> CalculateCartPrice(Cart cart)
+        public async Task CalculateCartPrice(Cart cart)
         {
-            return 0;
+            foreach (CartProduct cp in cart.CartProducts)
+            {
+                cart.CartPrice += (cp.Product.ProductPrice * cp.CartProductQuantity);
+            }
         }
     }
 }

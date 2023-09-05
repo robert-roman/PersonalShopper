@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PersonalShopper.DAL.DTOs;
 using PersonalShopper.DAL.Models;
 using PersonalShopper.Repositories.UnitOfWork;
+using PersonalShopper.Services.CartProductService;
 using PersonalShopper.Services.OrderService;
 using PersonalShopper.Services.UserService;
 using System.Security.Claims;
@@ -15,11 +16,14 @@ namespace PersonalShopper.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IOrderService _orderService;
+        private readonly ICartService _cartService;
 
-        public OrdersController(IUnitOfWork unitOfWork, IOrderService orderService)
+
+        public OrdersController(IUnitOfWork unitOfWork, IOrderService orderService, ICartService cartService)
         {
             _unitOfWork = unitOfWork;
             _orderService = orderService;
+            _cartService = cartService;
         }
 
         //GET: api/Orders/status
@@ -93,7 +97,7 @@ namespace PersonalShopper.Controllers
 
         }
 
-
+        //POST: api/Orders/
         [HttpPost]
         [Authorize(Roles = "Admin,User")]
         public async Task<ActionResult<OrderDTO>> PlaceUserOrder()
@@ -110,13 +114,15 @@ namespace PersonalShopper.Controllers
                 return NotFound("User not found");
             }
 
-            var orderCart = await _unitOfWork.Carts.GetCartById(int.Parse(currentUserID));
+            //var orderCart = await _unitOfWork.Carts.GetCartById(int.Parse(currentUserID));
+            await _cartService.CalculateCartPrice(loggedUser.Cart);
 
             var orderToPlace = new Order();
             orderToPlace.UserId = loggedUser.Id;
             orderToPlace.User = loggedUser;
             orderToPlace.OrderPlaceDate = DateTime.Now;
             orderToPlace.OrderStatus = "Placed";
+            orderToPlace.OrderPrice = loggedUser.Cart.CartPrice;
 
             var allOrderProducts = await _orderService.CreateOrderProducts(orderToPlace);
             
@@ -124,6 +130,11 @@ namespace PersonalShopper.Controllers
                 return BadRequest("The cart is empty. You need at least 1 product in cart to place an order");
 
             orderToPlace.OrderProducts = allOrderProducts;
+
+            foreach (CartProduct cp in loggedUser.Cart.CartProducts)
+            {
+                await _unitOfWork.CartProducts.Delete(cp);
+            }
 
             await _unitOfWork.Orders.Create(orderToPlace);
             _unitOfWork.Save();

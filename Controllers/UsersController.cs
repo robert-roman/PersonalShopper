@@ -7,6 +7,7 @@ using System.Linq;
 using PersonalShopper.DAL.Models;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using PersonalShopper.Services.CartProductService;
 
 namespace PersonalShopper.Controllers
 {
@@ -15,10 +16,13 @@ namespace PersonalShopper.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICartService _cartService;
 
-        public UsersController(IUnitOfWork unitOfWork)
+
+        public UsersController(IUnitOfWork unitOfWork, ICartService cartService)
         {
             _unitOfWork = unitOfWork;
+            _cartService = cartService;
         }
 
         //GET: api/Users/{email}
@@ -62,8 +66,9 @@ namespace PersonalShopper.Controllers
             }
 
             var userCart = await _unitOfWork.Carts.GetCartById(int.Parse(currentUserID));
-            var userCartDTO = new CartDTO(userCart);
+            await _cartService.CalculateCartPrice(userCart);
 
+            var userCartDTO = new CartDTO(userCart);
             return userCartDTO;
         }
 
@@ -73,8 +78,9 @@ namespace PersonalShopper.Controllers
         public async Task<ActionResult<CartDTO>> RefreshCartUser(int userId)
         {
             var userCart = await _unitOfWork.Carts.GetCartById(userId);
-            var userCartDTO = new CartDTO(userCart);
+            await _cartService.CalculateCartPrice(userCart);
 
+            var userCartDTO = new CartDTO(userCart);
             return userCartDTO;
         }
 

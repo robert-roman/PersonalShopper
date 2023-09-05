@@ -5,7 +5,7 @@ namespace PersonalShopper.Services.CartProductService
 {
     public interface ICartService
     {
-        Task ClearCart(Cart boughtCart);
-        Task<float> CalculateCartPrice(Cart cart);
+        //Task ClearCart(Cart boughtCart);
+        Task CalculateCartPrice(Cart cart);
     }
 }
