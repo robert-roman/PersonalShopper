@@ -68,7 +68,11 @@ namespace PersonalShopper.Controllers
             var userCart = await _unitOfWork.Carts.GetCartById(int.Parse(currentUserID));
             await _cartService.CalculateCartPrice(userCart);
 
+            var groupedCartProducts = await _unitOfWork.CartProducts.GroupProductsFromCartByCategory(userCart.CartId);
+            userCart.CartProducts = groupedCartProducts;
+
             var userCartDTO = new CartDTO(userCart);
+
             return userCartDTO;
         }
 

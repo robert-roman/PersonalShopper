@@ -130,13 +130,15 @@ namespace PersonalShopper.Controllers
                 return BadRequest("The cart is empty. You need at least 1 product in cart to place an order");
 
             orderToPlace.OrderProducts = allOrderProducts;
+            await _unitOfWork.Orders.Create(orderToPlace);
 
             foreach (CartProduct cp in loggedUser.Cart.CartProducts)
             {
                 await _unitOfWork.CartProducts.Delete(cp);
             }
-
-            await _unitOfWork.Orders.Create(orderToPlace);
+            loggedUser.Cart.CartPrice = 0;
+            loggedUser.UserOrders.Add(orderToPlace);
+            await _unitOfWork.Carts.Update(loggedUser.Cart);
             _unitOfWork.Save();
             var orderDTO = new OrderDTO(orderToPlace);
             return orderDTO;
