@@ -72,18 +72,18 @@ namespace PersonalShopper.Controllers
         //GET: api/Orders/email/{userEmail}
         [HttpGet("email/{userEmail}")]
         [Authorize(Roles = "Admin,User")]
-        public async Task<ActionResult<List<OrderDTO>>> GetAllUserOrders(string userEmail)
+        public async Task<ActionResult<IEnumerable<OrderDTO>>> GetAllUserOrders(string userEmail)
         {
             var currentUserID = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (currentUserID == null)
             {
-                return Forbid("No user currently logged in");
+                return BadRequest("No user currently logged in");
             }
 
             var loggedUser = await _unitOfWork.Users.GetUserById(int.Parse(currentUserID));
             if (!loggedUser.Email.Equals(userEmail) && !loggedUser.UserRoles.Any(ur => ur.Role.Name == "Admin"))
             {
-                return Forbid("Regular users can see only their orders");
+                return BadRequest("Regular users can see only their orders");
             }
 
             var userOrders = await _unitOfWork.Orders.GetAllUserOrders(loggedUser.Id);

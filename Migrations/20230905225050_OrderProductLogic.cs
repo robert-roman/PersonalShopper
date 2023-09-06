@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PersonalShopper.Migrations
 {
-    public partial class newOrderLogic : Migration
+    public partial class OrderProductLogic : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -208,6 +208,7 @@ namespace PersonalShopper.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     OrderPlaceDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    OrderPrice = table.Column<float>(type: "real", nullable: false),
                     OrderStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -288,7 +289,7 @@ namespace PersonalShopper.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderProduct",
+                name: "OrdersProducts",
                 columns: table => new
                 {
                     OrderId = table.Column<int>(type: "int", nullable: false),
@@ -299,9 +300,9 @@ namespace PersonalShopper.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderProduct", x => new { x.OrderId, x.ProductId });
+                    table.PrimaryKey("PK_OrdersProducts", x => new { x.OrderId, x.ProductId });
                     table.ForeignKey(
-                        name: "FK_OrderProduct_Orders_OrderId",
+                        name: "FK_OrdersProducts_Orders_OrderId",
                         column: x => x.OrderId,
                         principalTable: "Orders",
                         principalColumn: "OrderId",
@@ -395,7 +396,7 @@ namespace PersonalShopper.Migrations
                 name: "CartProducts");
 
             migrationBuilder.DropTable(
-                name: "OrderProduct");
+                name: "OrdersProducts");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");

@@ -83,8 +83,7 @@ namespace PersonalShopper.Controllers
                                             float OrderProductPrice, int OrderProductQuantity)>>>
                          SeePricesAndSales()
         {
-            var comparisons = await _unitOfWork.OrderProducts.ComparePricesForAProduct();
-            return comparisons;
+            return await _unitOfWork.OrderProducts.ComparePreviousPricesForProducts();
         }
 
 

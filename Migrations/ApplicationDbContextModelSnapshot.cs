@@ -202,7 +202,7 @@ namespace PersonalShopper.Migrations
 
                     b.HasKey("OrderId", "ProductId");
 
-                    b.ToTable("OrderProduct");
+                    b.ToTable("OrdersProducts");
                 });
 
             modelBuilder.Entity("PersonalShopper.DAL.Models.Product", b =>

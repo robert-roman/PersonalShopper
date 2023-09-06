@@ -12,8 +12,8 @@ using PersonalShopper.DAL;
 namespace PersonalShopper.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230905173221_addedOrderPrice")]
-    partial class addedOrderPrice
+    [Migration("20230905225050_OrderProductLogic")]
+    partial class OrderProductLogic
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -204,7 +204,7 @@ namespace PersonalShopper.Migrations
 
                     b.HasKey("OrderId", "ProductId");
 
-                    b.ToTable("OrderProduct");
+                    b.ToTable("OrdersProducts");
                 });
 
             modelBuilder.Entity("PersonalShopper.DAL.Models.Product", b =>
